@@ -10,8 +10,8 @@ if (window.innerWidth < 800) {
 }
 
 // Bird Variables
-let birdWidth = 64;
-let birdHeight = 64;
+let birdWidth = 48;
+let birdHeight = 48;
 let birdX = canvasWidth / 8;
 let birdY = canvasHeight / 2;
 let birdImg;
