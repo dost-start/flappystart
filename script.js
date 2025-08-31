@@ -63,7 +63,7 @@ window.onload = function() {
   bottomPipeImg.src = "assets/bottomPipe.png";
 
   requestAnimationFrame(update);
-  setInterval(placePipes, 1500);
+  setInterval(placePipes, 2000);
   document.addEventListener("keydown", moveBird);
 
   // Touch (tap on canvas for mobile)
@@ -197,11 +197,11 @@ function moveBird(e) {
     if (e.type === "keydown") {
         if (e.code === "Space" || e.code === "ArrowUp") {
             e.preventDefault();
-            velocityY = -6;
+            velocityY = -4;
         }
     } else if (e.type === "mousedown" || e.type === "touchstart") {
         if (e.cancelable) e.preventDefault();
-        velocityY = -6;
+        velocityY = -4;
     }
 }
 
