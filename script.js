@@ -4,21 +4,20 @@ let canvasHeight = 640;
 let canvasWidth = 360;
 let context;
 
-// Responsive design
+// Responsive design - fixed for consistent behavior
 function calculateResponsiveSize() {
-
-        canvasWidth = 340;
-        canvasHeight = 640;
-
+    // Use fixed dimensions for consistent behavior across all devices
+    canvasWidth = 360;
+    canvasHeight = 640;
 }
 
 calculateResponsiveSize();
 
-// Bird Variables - responsive sizing
-let scaleFactor = Math.min(canvasWidth / 360, canvasHeight / 640);
-let birdWidth = Math.max(32, 48 * scaleFactor);
-let birdHeight = Math.max(32, 48 * scaleFactor);
-let birdX = canvasWidth / 7.5;
+// Bird Variables - fixed sizing for consistent behavior
+let scaleFactor = 1; // Fixed scale factor
+let birdWidth = 48;
+let birdHeight = 48;
+let birdX = canvasWidth / 8;
 let birdY = canvasHeight / 2;
 let birdImg;
 
@@ -30,10 +29,10 @@ let bird = {
     rotation: 0
 };
 
-// Pipe Variables - responsive sizing
+// Pipe Variables - fixed sizing for consistent behavior
 let pipeArray = [];
-let pipeWidth = Math.max(48, 64 * scaleFactor);
-let pipeHeight = Math.max(300, 500 * scaleFactor);
+let pipeWidth = 64;
+let pipeHeight = 500;
 let pipeX = canvasWidth;
 let pipeY = 0;
 
@@ -90,25 +89,25 @@ window.onload = function() {
 }
 
 function handleResize() {
-    // Recalculate responsive sizes
+    // Keep consistent sizing - no responsive changes
     calculateResponsiveSize();
     
     // Update canvas size
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     
-    // Recalculate scale factor and update game elements
-    scaleFactor = Math.min(canvasWidth / 360, canvasHeight / 640);
+    // Keep fixed scale factor and update game elements
+    scaleFactor = 1;
     
-    // Update bird size and position
-    birdWidth = Math.max(32, 48 * scaleFactor);
-    birdHeight = Math.max(32, 48 * scaleFactor);
+    // Keep fixed bird size and position
+    birdWidth = 48;
+    birdHeight = 48;
     bird.width = birdWidth;
     bird.height = birdHeight;
     
-    // Update pipe dimensions
-    pipeWidth = Math.max(48, 64 * scaleFactor);
-    pipeHeight = Math.max(300, 500 * scaleFactor);
+    // Keep fixed pipe dimensions
+    pipeWidth = 64;
+    pipeHeight = 500;
     pipeX = canvasWidth;
 }
 
@@ -182,30 +181,30 @@ function update() {
     }
 
     context.fillStyle = "white";
-    context.font = `${Math.max(16, 20 * scaleFactor)}px Arial`;
+    context.font = "20px Arial";
     context.fillText(score, 10, 30);
 
     // Show "Flappy Start" title and "Tap to Start" message when game hasn't started
     if (!gameStarted && !gameOver) {
         // Game title
         const titleText = "Flappy Start";
-        context.font = `${Math.max(24, 36 * scaleFactor)}px Arial`;
+        context.font = "36px Arial";
         context.fillStyle = "white";
         context.textAlign = "left";
         context.textBaseline = "alphabetic";
         const titleWidth = context.measureText(titleText).width;
-        context.fillText(titleText, (canvas.width - titleWidth) / 2, canvas.height / 2 - 50 * scaleFactor);
+        context.fillText(titleText, (canvas.width - titleWidth) / 2, canvas.height / 2 - 50);
         
         // Start instruction
         const instructionText = "Tap to Start";
-        context.font = `${Math.max(18, 24 * scaleFactor)}px Arial`;
+        context.font = "24px Arial";
         const instructionWidth = context.measureText(instructionText).width;
-        context.fillText(instructionText, (canvas.width - instructionWidth) / 2, canvas.height / 2 + 50 * scaleFactor);
+        context.fillText(instructionText, (canvas.width - instructionWidth) / 2, canvas.height / 2 + 50);
     }
 
     if (gameOver) {
     const text = "GAME OVER";
-    context.font = `${Math.max(20, 30 * scaleFactor)}px Arial`;
+    context.font = "30px Arial";
     context.textAlign = "left";    // reset to default
     context.textBaseline = "alphabetic";
     const textWidth = context.measureText(text).width;
@@ -213,16 +212,16 @@ function update() {
 
     // Draw score below "GAME OVER"
     const scoreText = `Score: ${score}`;
-    context.font = `${Math.max(16, 24 * scaleFactor)}px Arial`;
+    context.font = "24px Arial";
     const scoreTextWidth = context.measureText(scoreText).width;
-    context.fillText(scoreText, (canvas.width - scoreTextWidth) / 2, canvas.height / 2 + 40 * scaleFactor);
+    context.fillText(scoreText, (canvas.width - scoreTextWidth) / 2, canvas.height / 2 + 40);
 
-    // 🔹 Restart button (upper right) - responsive sizing
+    // 🔹 Restart button (upper right) - fixed sizing
     context.save(); // save state
-    restartButton.width = Math.max(80, 100 * scaleFactor);
-    restartButton.height = Math.max(32, 40 * scaleFactor);
-    restartButton.x = canvas.width - restartButton.width - 20 * scaleFactor;
-    restartButton.y = 20 * scaleFactor;
+    restartButton.width = 100;
+    restartButton.height = 40;
+    restartButton.x = canvas.width - restartButton.width - 20;
+    restartButton.y = 20;
 
     // Button background
     context.fillStyle = "#ff4444";
@@ -238,7 +237,7 @@ function update() {
 
     // Button text
     context.fillStyle = "#ffffff";
-    context.font = `${Math.max(12, 16 * scaleFactor)}px Arial`;
+    context.font = "16px Arial";
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(
@@ -257,7 +256,7 @@ function placePipes() {
     if (gameOver || !gameStarted) {
         return;
     }
-    let openingSpace = Math.max(120, canvas.height / 4); // Ensure minimum opening space
+    let openingSpace = canvas.height / 4; // Fixed opening space like desktop
     let randomPipeY = -pipeHeight/4 - Math.random() * (pipeHeight/2);
 
     let topPipe = {

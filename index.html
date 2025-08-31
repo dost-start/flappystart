@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="icon" type="image/png" href="assets/logo.png" />
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -24,15 +24,26 @@
             background-position: center;
             border: 2px solid #333;
             border-radius: 8px;
-            max-width: 100vw;
-            max-height: 100vh;
+            /* Fixed canvas size - no responsive scaling */
+            width: 360px !important;
+            height: 640px !important;
+            image-rendering: pixelated; /* Crisp pixel rendering */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
         
-        /* Mobile specific styles */
+        /* Ensure canvas doesn't scale on mobile */
         @media (max-width: 480px) {
             #gameCanvas {
                 border: 1px solid #333;
                 border-radius: 4px;
+                /* Keep fixed size even on mobile */
+                width: 360px !important;
+                height: 640px !important;
+            }
+            body {
+                /* Allow scrolling if canvas is too big for screen */
+                overflow: auto;
             }
         }
     </style>
