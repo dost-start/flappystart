@@ -8,6 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" type="image/png" href="assets/logo.png" />
     
+    <!-- Supabase CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <title>Flappy Start</title>
     <style>
         * {
@@ -191,6 +194,158 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
+        /* Leaderboard Styles */
+        #nameInput {
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 200px;
+            text-align: center;
+            outline: none;
+            background-color: white;
+            color: black;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: default;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            pointer-events: auto;
+        }
+        
+        #nameInput:focus {
+            border-color: #ff4444;
+        }
+        
+        #submitScoreBtn {
+            padding: 12px 24px;
+            background-color: #44ff44;
+            color: black;
+            border: 2px solid #22cc22;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        #submitScoreBtn:hover {
+            background-color: #66ff66;
+            transform: translateY(-2px);
+        }
+        
+        #submitScoreBtn:disabled {
+            background-color: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #leaderboardBtn {
+            padding: 12px 24px;
+            background-color: #4444ff;
+            color: white;
+            border: 2px solid #2222cc;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        #leaderboardBtn:hover {
+            background-color: #6666ff;
+            transform: translateY(-2px);
+        }
+        
+        #leaderboardModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 50;
+            overflow-y: auto;
+        }
+        
+        #leaderboardContent {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        #closeLeaderboard {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        #closeLeaderboard:hover {
+            color: #000;
+        }
+        
+        #leaderboardList {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #leaderboardList li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #leaderboardList li:nth-child(1) {
+            background-color: #ffd700;
+            font-weight: bold;
+        }
+        
+        #leaderboardList li:nth-child(2) {
+            background-color: #c0c0c0;
+            font-weight: bold;
+        }
+        
+        #leaderboardList li:nth-child(3) {
+            background-color: #cd7f32;
+            font-weight: bold;
+        }
+        
+        .rank {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .player-name {
+            flex-grow: 1;
+            text-align: left;
+        }
+        
+        .score {
+            font-weight: bold;
+        }
+        
         /* Prevent scrolling on mobile */
         html, body {
             position: fixed;
@@ -251,10 +406,30 @@
             <div id="gameOverScreen">
                 <h1>GAME OVER</h1>
                 <p id="finalScore">Score: 0</p>
+                <div id="scoreSubmission">
+                    <input type="text" id="nameInput" placeholder="Enter your name" maxlength="20">
+                    <div>
+                        <button id="submitScoreBtn">Submit Score</button>
+                        <button id="leaderboardBtn">View Leaderboard</button>
+                    </div>
+                </div>
                 <button id="restartBtn">Restart</button>
             </div>
         </div>
     </div>
+    
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal">
+        <div id="leaderboardContent">
+            <button id="closeLeaderboard">&times;</button>
+            <h2>🏆 Leaderboard</h2>
+            <ul id="leaderboardList">
+                <li>Loading...</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="config.js"></script>
     <script src="script-dom.js"></script>
 </body>
 </html>

@@ -7,6 +7,17 @@ let gameOverScreen;
 let finalScoreElement;
 let restartBtn;
 
+// Leaderboard elements
+let nameInput;
+let submitScoreBtn;
+let leaderboardBtn;
+let leaderboardModal;
+let leaderboardList;
+let closeLeaderboardBtn;
+
+// Supabase configuration
+let supabase = null;
+
 // Debug mode
 const DEBUG_MODE = false; // Set to false to remove debug visuals
 
@@ -57,6 +68,17 @@ window.onload = function() {
 }
 
 function initializeGame() {
+    // Initialize Supabase if credentials are provided
+    const config = window.SUPABASE_CONFIG || {};
+    if (config.url && config.anonKey && 
+        config.url !== 'YOUR_SUPABASE_URL_HERE' && 
+        config.anonKey !== 'YOUR_SUPABASE_ANON_KEY_HERE') {
+        supabase = window.supabase.createClient(config.url, config.anonKey);
+        console.log('Supabase initialized successfully');
+    } else {
+        console.warn('Supabase not configured. Please update config.js with your credentials.');
+    }
+    
     // Get DOM elements
     gameContainer = document.getElementById('gameContainer');
     bird = document.getElementById('bird');
@@ -65,6 +87,14 @@ function initializeGame() {
     gameOverScreen = document.getElementById('gameOverScreen');
     finalScoreElement = document.getElementById('finalScore');
     restartBtn = document.getElementById('restartBtn');
+    
+    // Get leaderboard elements
+    nameInput = document.getElementById('nameInput');
+    submitScoreBtn = document.getElementById('submitScoreBtn');
+    leaderboardBtn = document.getElementById('leaderboardBtn');
+    leaderboardModal = document.getElementById('leaderboardModal');
+    leaderboardList = document.getElementById('leaderboardList');
+    closeLeaderboardBtn = document.getElementById('closeLeaderboard');
     
     // Set initial bird position
     updateBirdPosition();
@@ -96,8 +126,43 @@ function setupEventListeners() {
         resetGame();
     }, { passive: false });
     
-    // Prevent default behaviors
+    // Leaderboard event listeners
+    if (submitScoreBtn) {
+        submitScoreBtn.addEventListener('click', submitScore);
+    }
+    
+    if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', showLeaderboard);
+    }
+    
+    if (closeLeaderboardBtn) {
+        closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
+    }
+    
+    if (leaderboardModal) {
+        leaderboardModal.addEventListener('click', function(e) {
+            if (e.target === leaderboardModal) {
+                hideLeaderboard();
+            }
+        });
+    }
+    
+    // Enter key to submit score
+    if (nameInput) {
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitScore();
+            }
+        });
+    }
+    
+    // Prevent default behaviors (but not when typing in input fields)
     document.addEventListener('keydown', function(e) {
+        // Don't prevent default if user is typing in an input field
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            return;
+        }
+        
         if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
             e.preventDefault();
         }
@@ -113,6 +178,11 @@ function setupEventListeners() {
 }
 
 function handleInput(e) {
+    // Don't prevent input if user is typing in the name field
+    if (e.target && e.target.id === 'nameInput') {
+        return;
+    }
+    
     e.preventDefault();
     
     // Check input cooldown
@@ -384,6 +454,117 @@ function resetGame() {
     startScreen.style.display = 'flex';
     gameOverScreen.style.display = 'none';
     
+    // Reset leaderboard UI
+    if (nameInput) nameInput.value = '';
+    if (submitScoreBtn) submitScoreBtn.disabled = false;
+    
     // Remove any animation classes
     bird.classList.remove('bird-jump');
+}
+
+// Leaderboard Functions
+async function submitScore() {
+    if (!supabase) {
+        alert('Leaderboard not configured. Please add your Supabase credentials.');
+        return;
+    }
+    
+    const playerName = nameInput.value.trim();
+    if (!playerName) {
+        alert('Please enter your name!');
+        nameInput.focus();
+        return;
+    }
+    
+    if (playerName.length > 20) {
+        alert('Name must be 20 characters or less!');
+        return;
+    }
+    
+    // Disable button to prevent double submission
+    submitScoreBtn.disabled = true;
+    submitScoreBtn.textContent = 'Submitting...';
+    
+    try {
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .insert([
+                { player_name: playerName, score: score }
+            ]);
+        
+        if (error) {
+            console.error('Error submitting score:', error);
+            alert('Failed to submit score. Please try again.');
+            submitScoreBtn.disabled = false;
+            submitScoreBtn.textContent = 'Submit Score';
+        } else {
+            submitScoreBtn.textContent = 'Score Submitted!';
+            setTimeout(() => {
+                showLeaderboard();
+            }, 1000);
+        }
+    } catch (err) {
+        console.error('Network error:', err);
+        alert('Network error. Please check your connection and try again.');
+        submitScoreBtn.disabled = false;
+        submitScoreBtn.textContent = 'Submit Score';
+    }
+}
+
+async function showLeaderboard() {
+    if (!supabase) {
+        alert('Leaderboard not configured. Please add your Supabase credentials.');
+        return;
+    }
+    
+    leaderboardModal.style.display = 'block';
+    leaderboardList.innerHTML = '<li>Loading...</li>';
+    
+    try {
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .select('player_name, score, created_at')
+            .order('score', { ascending: false })
+            .limit(10);
+        
+        if (error) {
+            console.error('Error fetching leaderboard:', error);
+            leaderboardList.innerHTML = '<li>Failed to load leaderboard</li>';
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            leaderboardList.innerHTML = '<li>No scores yet. Be the first!</li>';
+            return;
+        }
+        
+        // Display the leaderboard
+        leaderboardList.innerHTML = '';
+        data.forEach((entry, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="rank">#${index + 1}</span>
+                <span class="player-name">${escapeHtml(entry.player_name)}</span>
+                <span class="score">${entry.score}</span>
+            `;
+            leaderboardList.appendChild(li);
+        });
+        
+    } catch (err) {
+        console.error('Network error:', err);
+        leaderboardList.innerHTML = '<li>Network error. Please try again.</li>';
+    }
+}
+
+function hideLeaderboard() {
+    leaderboardModal.style.display = 'none';
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
