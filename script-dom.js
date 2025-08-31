@@ -40,6 +40,7 @@ let lastPipeTime = 0;
 let pipeInterval = 2000;
 let minPipeInterval = 800;
 let maxPipeInterval = 1500;
+let xOffset = 100;
 
 // Timing
 let lastTime = 0;
@@ -226,7 +227,7 @@ function updatePipes(currentTime) {
     if (currentTime - lastPipeTime > pipeInterval) {
         createPipe();
         lastPipeTime = currentTime;
-        // pipeInterval = maxPipeInterval // + Math.random() * (maxPipeInterval - minPipeInterval);
+        pipeInterval = maxPipeInterval + Math.random() * (maxPipeInterval - minPipeInterval);
     }
     
     // Update existing pipes
@@ -290,7 +291,7 @@ function createPipe() {
     
     // Store pipe data - ensuring collision bounds match visual bounds exactly
     pipes.push({
-        x: GAME_WIDTH,
+        x: GAME_WIDTH + xOffset,
         topY: pipeY,
         bottomY: pipeY + pipeHeight + gap,
         width: pipeWidth,
