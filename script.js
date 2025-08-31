@@ -6,29 +6,10 @@ let context;
 
 // Responsive design
 function calculateResponsiveSize() {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    
-    // For very small screens (mobile portrait)
-    if (screenWidth < 400) {
-        canvasWidth = Math.max(320, screenWidth * 0.95); // Minimum 320px
-        canvasHeight = Math.min(screenHeight * 0.9, canvasWidth * 1.8); // Maintain aspect ratio
-    }
-    // For mobile landscape and small tablets
-    else if (screenWidth < 768) {
-        canvasWidth = Math.min(screenWidth * 0.9, 500);
-        canvasHeight = Math.min(screenHeight * 0.85, canvasWidth * 1.6);
-    }
-    // For tablets and larger screens
-    else if (screenWidth < 1024) {
-        canvasWidth = Math.min(screenWidth * 0.7, 600);
-        canvasHeight = Math.min(screenHeight * 0.8, canvasWidth * 1.5);
-    }
-    // For desktop (default)
-    else {
-        canvasWidth = 360;
+
+        canvasWidth = 340;
         canvasHeight = 640;
-    }
+
 }
 
 calculateResponsiveSize();
@@ -37,7 +18,7 @@ calculateResponsiveSize();
 let scaleFactor = Math.min(canvasWidth / 360, canvasHeight / 640);
 let birdWidth = Math.max(32, 48 * scaleFactor);
 let birdHeight = Math.max(32, 48 * scaleFactor);
-let birdX = canvasWidth / 8;
+let birdX = canvasWidth / 7.5;
 let birdY = canvasHeight / 2;
 let birdImg;
 
