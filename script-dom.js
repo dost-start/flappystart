@@ -169,6 +169,49 @@ function setupEventListeners() {
                 submitScore();
             }
         });
+        
+        // Add focus and input handling to ensure the input works properly
+        nameInput.addEventListener('focus', function(e) {
+            e.stopPropagation();
+            console.log('Name input focused');
+            this.style.backgroundColor = '#f0f8ff';
+        });
+        
+        nameInput.addEventListener('blur', function(e) {
+            e.stopPropagation();
+            this.style.backgroundColor = 'white';
+        });
+        
+        nameInput.addEventListener('input', function(e) {
+            e.stopPropagation();
+            console.log('Input value changed:', this.value);
+        });
+        
+        nameInput.addEventListener('keydown', function(e) {
+            e.stopPropagation();
+            console.log('Key down:', e.key, e.code);
+            // Allow normal typing
+            if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                return true;
+            }
+        });
+        
+        nameInput.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+            console.log('Touch start on input');
+            this.focus();
+        });
+        
+        nameInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Click on input');
+            this.focus();
+        });
+        
+        // Ensure the input is properly configured
+        nameInput.removeAttribute('readonly');
+        nameInput.removeAttribute('disabled');
+        nameInput.setAttribute('tabindex', '0');
     }
     
     // Prevent default behaviors (but not when typing in input fields)
@@ -184,17 +227,31 @@ function setupEventListeners() {
     }, false);
     
     gameContainer.addEventListener('touchend', function(e) {
+        // Don't prevent touch events on input fields
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON')) {
+            return;
+        }
         e.preventDefault();
     }, { passive: false });
     
     gameContainer.addEventListener('contextmenu', function(e) {
+        // Don't prevent context menu on input fields
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            return;
+        }
         e.preventDefault();
     }, false);
 }
 
 function handleInput(e) {
-    // Don't prevent input if user is typing in the name field
-    if (e.target && e.target.id === 'nameInput') {
+    // Don't prevent input if user is typing in input/textarea fields or clicking buttons
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON')) {
+        return;
+    }
+    
+    // Don't handle input during leaderboard modal interactions
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    if (leaderboardModal && leaderboardModal.style.display === 'block') {
         return;
     }
     
