@@ -256,8 +256,12 @@ function placePipes() {
     if (gameOver || !gameStarted) {
         return;
     }
-    let openingSpace = canvas.height / 4; // Fixed opening space like desktop
-    let randomPipeY = -pipeHeight/4 - Math.random() * (pipeHeight/2);
+    
+    // Use absolute values instead of canvas height dependency
+    let openingSpace = 160; // Fixed 160px gap between pipes (instead of canvas.height / 4)
+    let minPipeY = -350; // Absolute minimum Y position for top pipe
+    let maxPipeY = -150; // Absolute maximum Y position for top pipe
+    let randomPipeY = minPipeY + Math.random() * (maxPipeY - minPipeY);
 
     let topPipe = {
         img : topPipeImg,
@@ -273,7 +277,7 @@ function placePipes() {
     let bottomPipe = {
         img : bottomPipeImg,
         x : pipeX,
-        y : randomPipeY + pipeHeight + openingSpace, // directly below top pipe + gap
+        y : randomPipeY + pipeHeight + openingSpace, // directly below top pipe + fixed gap
         width : pipeWidth,
         height : pipeHeight,
         passed : false
