@@ -2,14 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="assets/logo.png" />
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>START Game</title>
+    <title>Flappy Start</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #87CEEB;
+        }
+        #gameCanvas {
+            background-image: url('assets/background.png');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #333;
+            border-radius: 8px;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        
+        /* Mobile specific styles */
+        @media (max-width: 480px) {
+            #gameCanvas {
+                border: 1px solid #333;
+                border-radius: 4px;
+            }
+        }
+    </style>
 </head>
-<body class="flex justify-center p-0 m-0 overflow-hidden">
-    <canvas id="gameCanvas" class="bg-[url('assets/background.png')] bg-cover"></canvas>
+<body>
+    <canvas id="gameCanvas"></canvas>
     <script src="script.js"></script>
 </body>
 </html>

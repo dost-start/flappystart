@@ -4,14 +4,39 @@ let canvasHeight = 640;
 let canvasWidth = 360;
 let context;
 
-if (window.innerWidth < 800) {
-    canvasHeight = window.innerHeight;
-    canvasWidth = window.innerWidth;
+// Responsive design
+function calculateResponsiveSize() {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    // For very small screens (mobile portrait)
+    if (screenWidth < 400) {
+        canvasWidth = Math.max(320, screenWidth * 0.95); // Minimum 320px
+        canvasHeight = Math.min(screenHeight * 0.9, canvasWidth * 1.8); // Maintain aspect ratio
+    }
+    // For mobile landscape and small tablets
+    else if (screenWidth < 768) {
+        canvasWidth = Math.min(screenWidth * 0.9, 500);
+        canvasHeight = Math.min(screenHeight * 0.85, canvasWidth * 1.6);
+    }
+    // For tablets and larger screens
+    else if (screenWidth < 1024) {
+        canvasWidth = Math.min(screenWidth * 0.7, 600);
+        canvasHeight = Math.min(screenHeight * 0.8, canvasWidth * 1.5);
+    }
+    // For desktop (default)
+    else {
+        canvasWidth = 360;
+        canvasHeight = 640;
+    }
 }
 
-// Bird Variables
-let birdWidth = 48;
-let birdHeight = 48;
+calculateResponsiveSize();
+
+// Bird Variables - responsive sizing
+let scaleFactor = Math.min(canvasWidth / 360, canvasHeight / 640);
+let birdWidth = Math.max(32, 48 * scaleFactor);
+let birdHeight = Math.max(32, 48 * scaleFactor);
 let birdX = canvasWidth / 8;
 let birdY = canvasHeight / 2;
 let birdImg;
@@ -21,12 +46,13 @@ let bird = {
     y: birdY,
     width: birdWidth,
     height: birdHeight,
+    rotation: 0
 };
 
-// Pipe Variables
+// Pipe Variables - responsive sizing
 let pipeArray = [];
-let pipeWidth = 64;
-let pipeHeight = 500;
+let pipeWidth = Math.max(48, 64 * scaleFactor);
+let pipeHeight = Math.max(300, 500 * scaleFactor);
 let pipeX = canvasWidth;
 let pipeY = 0;
 
@@ -36,11 +62,21 @@ let bottomPipeImg;
 // Physics
 let velocityX = -2;
 let velocityY = 0;
-let gravity = 0.4;
+let gravity = 0.25;
+let jumpStrength = -6;
+let maxFallSpeed = 8;
+let rotationSpeed = 2;
 
 let gameOver = false;
+let gameStarted = false;
 let score = 0;
 let restartButton = { x: 0, y: 0, width: 100, height: 40 };
+
+// Pipe spawning variables
+let lastPipeTime = 0;
+let nextPipeInterval = 2000; // Initial interval
+let minPipeInterval = 800;  
+let maxPipeInterval = 1500; 
 
 window.onload = function() {
   canvas = document.getElementById("gameCanvas");
@@ -63,11 +99,36 @@ window.onload = function() {
   bottomPipeImg.src = "assets/bottomPipe.png";
 
   requestAnimationFrame(update);
-  setInterval(placePipes, 2000);
   document.addEventListener("keydown", moveBird);
 
   // Touch (tap on canvas for mobile)
   canvas.addEventListener("touchstart", moveBird, { passive: false });
+  
+  // Add window resize handler for responsiveness
+  window.addEventListener("resize", handleResize);
+}
+
+function handleResize() {
+    // Recalculate responsive sizes
+    calculateResponsiveSize();
+    
+    // Update canvas size
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    
+    // Recalculate scale factor and update game elements
+    scaleFactor = Math.min(canvasWidth / 360, canvasHeight / 640);
+    
+    // Update bird size and position
+    birdWidth = Math.max(32, 48 * scaleFactor);
+    birdHeight = Math.max(32, 48 * scaleFactor);
+    bird.width = birdWidth;
+    bird.height = birdHeight;
+    
+    // Update pipe dimensions
+    pipeWidth = Math.max(48, 64 * scaleFactor);
+    pipeHeight = Math.max(300, 500 * scaleFactor);
+    pipeX = canvasWidth;
 }
 
 function update() {
@@ -77,44 +138,93 @@ function update() {
     }
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Redraw the bird
-    velocityY += gravity;
-    bird.y += velocityY;
-    bird.y = Math.max(bird.y + velocityY, 0); // Prevent bird from going above canvas
+    // Only apply physics if game has started
+    if (gameStarted) {
+        // Bird physics
+        velocityY += gravity;
+        velocityY = Math.min(velocityY, maxFallSpeed); // Cap falling speed
+        bird.y += velocityY;
+        bird.y = Math.max(bird.y, 0); // Prevent bird from going above canvas
+        
+        // Rotation based on velocity
+        if (velocityY < 0) {
+            // Bird is moving up, rotate slightly upward
+            bird.rotation = Math.max(bird.rotation - rotationSpeed, -20);
+        } else {
+            // Bird is falling, rotate downward
+            bird.rotation = Math.min(bird.rotation + rotationSpeed, 90);
+        }
+    }
 
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+    // Draw bird with rotation
+    context.save();
+    context.translate(bird.x + bird.width/2, bird.y + bird.height/2);
+    context.rotate(bird.rotation * Math.PI / 180);
+    context.drawImage(birdImg, -bird.width/2, -bird.height/2, bird.width, bird.height);
+    context.restore();
 
     if (bird.y > canvas.height) {
         gameOver = true;
     };
-    // Pipes
-    for (let i = 0; i < pipeArray.length; i++) {
-        let pipe = pipeArray[i];
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+    
+    // Only process pipes if game has started
+    if (gameStarted) {
+        // Dynamic pipe spawning with variable density
+        let currentTime = Date.now();
+        if (currentTime - lastPipeTime > nextPipeInterval) {
+            placePipes();
+            lastPipeTime = currentTime;
+            // Set next random interval
+            nextPipeInterval = minPipeInterval + Math.random() * (maxPipeInterval - minPipeInterval);
+        }
+        
+        // Pipes
+        for (let i = 0; i < pipeArray.length; i++) {
+            let pipe = pipeArray[i];
+            pipe.x += velocityX;
+            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-        if (!pipe.passed && pipe.x + pipe.width < bird.x) {
-            pipe.passed = true;
-            score+=0.5;
+            if (!pipe.passed && pipe.x + pipe.width < bird.x) {
+                pipe.passed = true;
+                score+=0.5;
+            }
+
+            if (detectCollision(bird, pipe)) {
+                gameOver = true;
+            }
         }
 
-        if (detectCollision(bird, pipe)) {
-            gameOver = true;
+        // Clear Pipes
+        while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
+            pipeArray.shift();
         }
-    }
-
-    // Clear Pipes
-    while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
-        pipeArray.shift();
     }
 
     context.fillStyle = "white";
-    context.font = "20px Arial";
+    context.font = `${Math.max(16, 20 * scaleFactor)}px Arial`;
     context.fillText(score, 10, 30);
+
+    // Show "Flappy Start" title and "Tap to Start" message when game hasn't started
+    if (!gameStarted && !gameOver) {
+        // Game title
+        const titleText = "Flappy Start";
+        context.font = `${Math.max(24, 36 * scaleFactor)}px Arial`;
+        context.fillStyle = "white";
+        context.textAlign = "left";
+        context.textBaseline = "alphabetic";
+        const titleWidth = context.measureText(titleText).width;
+        context.fillText(titleText, (canvas.width - titleWidth) / 2, canvas.height / 2 - 50 * scaleFactor);
+        
+        // Start instruction
+        const instructionText = "Tap to Start";
+        context.font = `${Math.max(18, 24 * scaleFactor)}px Arial`;
+        const instructionWidth = context.measureText(instructionText).width;
+        context.fillText(instructionText, (canvas.width - instructionWidth) / 2, canvas.height / 2 + 50 * scaleFactor);
+    }
 
     if (gameOver) {
     const text = "GAME OVER";
-    context.font = "30px Arial";
+    context.font = `${Math.max(20, 30 * scaleFactor)}px Arial`;
     context.textAlign = "left";    // reset to default
     context.textBaseline = "alphabetic";
     const textWidth = context.measureText(text).width;
@@ -122,16 +232,16 @@ function update() {
 
     // Draw score below "GAME OVER"
     const scoreText = `Score: ${score}`;
-    context.font = "24px Arial";
+    context.font = `${Math.max(16, 24 * scaleFactor)}px Arial`;
     const scoreTextWidth = context.measureText(scoreText).width;
-    context.fillText(scoreText, (canvas.width - scoreTextWidth) / 2, canvas.height / 2 + 40);
+    context.fillText(scoreText, (canvas.width - scoreTextWidth) / 2, canvas.height / 2 + 40 * scaleFactor);
 
-    // 🔹 Restart button (upper right)
+    // 🔹 Restart button (upper right) - responsive sizing
     context.save(); // save state
-    restartButton.width = 100;
-    restartButton.height = 40;
-    restartButton.x = canvas.width - restartButton.width - 20;
-    restartButton.y = 20;
+    restartButton.width = Math.max(80, 100 * scaleFactor);
+    restartButton.height = Math.max(32, 40 * scaleFactor);
+    restartButton.x = canvas.width - restartButton.width - 20 * scaleFactor;
+    restartButton.y = 20 * scaleFactor;
 
     // Button background
     context.fillStyle = "#ff4444";
@@ -147,7 +257,7 @@ function update() {
 
     // Button text
     context.fillStyle = "#ffffff";
-    context.font = "16px Arial";
+    context.font = `${Math.max(12, 16 * scaleFactor)}px Arial`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(
@@ -163,10 +273,10 @@ function update() {
 }
 
 function placePipes() {
-        if (gameOver) {
+    if (gameOver || !gameStarted) {
         return;
     }
-    let openingSpace = canvas.height / 4;
+    let openingSpace = Math.max(120, canvas.height / 4); // Ensure minimum opening space
     let randomPipeY = -pipeHeight/4 - Math.random() * (pipeHeight/2);
 
     let topPipe = {
@@ -193,15 +303,20 @@ function placePipes() {
 }
 
 function moveBird(e) {
+    // Start the game on first input
+    if (!gameStarted && !gameOver) {
+        gameStarted = true;
+    }
+    
     // Prevent zooming on spacebar, arrow keys, or touch
     if (e.type === "keydown") {
         if (e.code === "Space" || e.code === "ArrowUp") {
             e.preventDefault();
-            velocityY = -4;
+            velocityY = jumpStrength;
         }
     } else if (e.type === "mousedown" || e.type === "touchstart") {
         if (e.cancelable) e.preventDefault();
-        velocityY = -4;
+        velocityY = jumpStrength;
     }
 }
 
@@ -236,8 +351,14 @@ function checkRestartClick(e) {
 
 function resetGame() {
     bird.y = birdY;
+    bird.rotation = 0;
     pipeArray = [];
     score = 0;
     gameOver = false;
+    gameStarted = false;
     velocityY = 0;
+    
+    // Reset pipe timing
+    lastPipeTime = 0;
+    nextPipeInterval = 2000; // Reset to initial interval
 }
