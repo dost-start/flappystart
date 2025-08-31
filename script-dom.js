@@ -129,14 +129,29 @@ function setupEventListeners() {
     // Leaderboard event listeners
     if (submitScoreBtn) {
         submitScoreBtn.addEventListener('click', submitScore);
+        submitScoreBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            submitScore();
+        }, { passive: false });
     }
     
     if (leaderboardBtn) {
         leaderboardBtn.addEventListener('click', showLeaderboard);
+        leaderboardBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showLeaderboard();
+        }, { passive: false });
     }
     
     if (closeLeaderboardBtn) {
         closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
+        closeLeaderboardBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            hideLeaderboard();
+        }, { passive: false });
     }
     
     if (leaderboardModal) {

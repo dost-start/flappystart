@@ -180,6 +180,11 @@
             transition: all 0.2s ease;
             margin-top: 20px;
             outline: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
         }
         
         #restartBtn:hover {
@@ -229,9 +234,14 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-           
+            pointer-events: auto;
             outline: none;
             transition: all 0.2s ease;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
         }
         
         #submitScoreBtn:hover {
@@ -258,6 +268,12 @@
             margin: 0 10px;
             outline: none;
             transition: all 0.2s ease;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
         }
         
         #leaderboardBtn:hover {
@@ -439,6 +455,39 @@
             #leaderboardList li {
                 padding: 8px;
                 font-size: 14px;
+            }
+            
+            /* Improve button spacing and size on mobile */
+            #submitScoreBtn, #leaderboardBtn, #restartBtn {
+                min-height: 48px;
+                min-width: 120px;
+                margin: 8px 5px;
+                font-size: 16px;
+                padding: 14px 20px;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            }
+            
+            #nameInput {
+                min-height: 48px;
+                font-size: 16px;
+                padding: 14px;
+                width: 220px;
+                max-width: 90%;
+            }
+            
+            #scoreSubmission {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            #scoreSubmission > div {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
             }
         }
         
