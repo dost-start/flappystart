@@ -32,20 +32,7 @@
             image-rendering: crisp-edges;
         }
         
-        /* Ensure canvas doesn't scale on mobile */
-        @media (max-width: 480px) {
-            #gameCanvas {
-                border: 1px solid #333;
-                border-radius: 4px;
-                /* Keep fixed size even on mobile */
-                width: 360px !important;
-                height: 640px !important;
-            }
-            body {
-                /* Allow scrolling if canvas is too big for screen */
-                overflow: auto;
-            }
-        }
+
     </style>
 </head>
 <body>
