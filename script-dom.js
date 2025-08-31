@@ -227,7 +227,7 @@ function updatePipes(currentTime) {
     if (currentTime - lastPipeTime > pipeInterval) {
         createPipe();
         lastPipeTime = currentTime;
-        pipeInterval = maxPipeInterval + Math.random() * (maxPipeInterval - minPipeInterval);
+       // pipeInterval = maxPipeInterval + Math.random() * (maxPipeInterval - minPipeInterval);
     }
     
     // Update existing pipes
