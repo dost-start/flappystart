@@ -40,7 +40,7 @@ let lastPipeTime = 0;
 let pipeInterval = 2000;
 let minPipeInterval = 800;
 let maxPipeInterval = 1500;
-let xOffset = 200;
+let xOffset = 50;
 
 // Timing
 let lastTime = 0;
@@ -369,7 +369,7 @@ function resetGame() {
     birdY = GAME_HEIGHT / 2;
     lastTime = 0;
     lastPipeTime = 0;
-    pipeInterval = 1500;
+    pipeInterval = 2000;
     inputCooldown = 0;
     
     // Clear pipes
