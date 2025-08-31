@@ -525,7 +525,7 @@ async function showLeaderboard() {
             .from('leaderboard')
             .select('player_name, score, created_at')
             .order('score', { ascending: false })
-            .limit(10);
+            .limit(50); // Increased from 10 to 50 since we now have scrolling
         
         if (error) {
             console.error('Error fetching leaderboard:', error);

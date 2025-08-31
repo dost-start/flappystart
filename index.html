@@ -220,6 +220,7 @@
         }
         
         #submitScoreBtn {
+            margin-bottom: 12px;
             padding: 12px 24px;
             background-color: #44ff44;
             color: black;
@@ -228,7 +229,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin: 0 10px;
+           
             outline: none;
             transition: all 0.2s ease;
         }
@@ -278,13 +279,28 @@
         
         #leaderboardContent {
             background-color: white;
-            margin: 50px auto;
-            padding: 30px;
+            margin: 20px auto;
+            padding: 0;
             border-radius: 15px;
             max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
+            max-height: 90vh;
+            min-height: 300px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        #leaderboardHeader {
+            padding: 20px 30px;
+            border-bottom: 2px solid #eee;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        #leaderboardHeader h2 {
+            margin: 0;
+            padding-right: 40px;
         }
         
         #closeLeaderboard {
@@ -293,18 +309,52 @@
             right: 20px;
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
         }
         
         #closeLeaderboard:hover {
-            color: #000;
+            color: #fff;
+            background-color: #ff4444;
+        }
+        
+        #leaderboardScrollContainer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+            max-height: calc(90vh - 100px);
+        }
+        
+        #leaderboardScrollContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #leaderboardScrollContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        #leaderboardScrollContainer::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        #leaderboardScrollContainer::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
         }
         
         #leaderboardList {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         
         #leaderboardList li {
@@ -369,6 +419,39 @@
             }
         }
         
+        /* Mobile responsive leaderboard */
+        @media screen and (max-width: 450px) {
+            #leaderboardContent {
+                margin: 10px;
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 20px);
+            }
+            
+            #leaderboardHeader {
+                padding: 15px 20px;
+            }
+            
+            #leaderboardScrollContainer {
+                padding: 15px 20px;
+                max-height: calc(100vh - 120px);
+            }
+            
+            #leaderboardList li {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+        
+        @media screen and (max-height: 600px) {
+            #leaderboardContent {
+                max-height: calc(100vh - 10px);
+            }
+            
+            #leaderboardScrollContainer {
+                max-height: calc(100vh - 80px);
+            }
+        }
+        
         /* Animation classes */
         .pipe-move {
             animation: movePipe linear infinite;
@@ -421,11 +504,15 @@
     <!-- Leaderboard Modal -->
     <div id="leaderboardModal">
         <div id="leaderboardContent">
-            <button id="closeLeaderboard">&times;</button>
-            <h2>🏆 Leaderboard</h2>
-            <ul id="leaderboardList">
-                <li>Loading...</li>
-            </ul>
+            <div id="leaderboardHeader">
+                <h2>🏆 Leaderboard</h2>
+                <button id="closeLeaderboard">&times;</button>
+            </div>
+            <div id="leaderboardScrollContainer">
+                <ul id="leaderboardList">
+                    <li>Loading...</li>
+                </ul>
+            </div>
         </div>
     </div>
     
