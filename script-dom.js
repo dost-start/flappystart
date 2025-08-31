@@ -291,7 +291,7 @@ function createPipe() {
     
     // Store pipe data - ensuring collision bounds match visual bounds exactly
     pipes.push({
-        x: GAME_WIDTH + xOffset,
+        x: GAME_WIDTH,
         topY: pipeY,
         bottomY: pipeY + pipeHeight + gap,
         width: pipeWidth,
