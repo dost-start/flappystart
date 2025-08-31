@@ -40,7 +40,7 @@ let lastPipeTime = 0;
 let pipeInterval = 2000;
 let minPipeInterval = 800;
 let maxPipeInterval = 1500;
-let xOffset = 500;
+let xOffset = 200;
 
 // Timing
 let lastTime = 0;
