@@ -226,7 +226,7 @@ function updatePipes(currentTime) {
     if (currentTime - lastPipeTime > pipeInterval) {
         createPipe();
         lastPipeTime = currentTime;
-        pipeInterval = minPipeInterval + Math.random() * (maxPipeInterval - minPipeInterval);
+        // pipeInterval = maxPipeInterval // + Math.random() * (maxPipeInterval - minPipeInterval);
     }
     
     // Update existing pipes
@@ -368,7 +368,7 @@ function resetGame() {
     birdY = GAME_HEIGHT / 2;
     lastTime = 0;
     lastPipeTime = 0;
-    pipeInterval = 2000;
+    pipeInterval = 1500;
     inputCooldown = 0;
     
     // Clear pipes
